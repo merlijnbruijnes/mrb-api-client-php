@@ -7,10 +7,10 @@ require_once '../src/MRBApiClient.php';
 
 $client = new MrbApiClient(
     [
-        'client_id'     => '5_5yxhp4owymsc0sgs4wsc4k4swo80oog0kks8okg0sgkssco8s4',
-        'client_secret' => '5v0llq4czcgsw8gw848k8s8sgcc04cocks8w08co4sgs8ww8cs',
-        'username'      => 'api',
-        'password'      => 'H6HaZB',
+        'client_id'     => '',
+        'client_secret' => '',
+        'username'      => '',
+        'password'      => '',
     ]
 );
 
@@ -21,3 +21,4 @@ $data = json_decode(
 
 print_r('<PRE>');
 print_r($data);
+print_r('</PRE>');
