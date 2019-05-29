@@ -53,49 +53,6 @@ class MrbApiClient
         );
     }
 
-    private function _getUrl($endpoint, $params)
-    {
-        $url = self::API_URL . $endpoint;
-
-        if (isset($params['id'])) {
-            $url = $url . '/' . $params['id'];
-        }
-
-        return $url;
-    }
-
-    private function _newToken($config)
-    {
-        $this->config = array_merge(
-            [
-                'grant_type' => 'password'
-            ],
-            $config
-        );
-
-        $result = json_decode(
-            $this->_call(self::OAUTH2_TOKEN_URL, "POST", [], $this->config),
-            true
-        );
-
-        if (isset($result['error'])) {
-            return $result;
-        }
-
-        $cookieExpiration = (time() + 3600 * 24 * 7);
-
-        $cookieValue = [
-            'access_token' => $result['access_token'],
-            'refresh_token' => $result['refresh_token'],
-            'token_expires_at' => (time() + $result['expires_in']),
-            'cookie_expires_at' => $cookieExpiration
-        ];
-
-        setcookie('MRBAPITOKEN', json_encode($cookieValue), $cookieExpiration, '/');
-
-        return $result;
-    }
-
     public function post($endpoint, $params = [])
     {
         return $this->_call(
@@ -114,38 +71,6 @@ class MrbApiClient
             [],
             $params
         );
-    }
-
-    private function _refreshToken($config)
-    {
-        $cookie = json_decode($_COOKIE['MRBAPITOKEN'], true);
-        $this->config = array_merge(
-            [
-                'refresh_token' => $cookie['refresh_token'],
-                'grant_type' => 'refresh_token'
-            ],
-            $config
-        );
-
-        $result = json_decode(
-            $this->_call(self::OAUTH2_TOKEN_URL, "POST", [], $this->config),
-            true
-        );
-
-        if (isset($result['error'])) {
-            return $result;
-        }
-
-        $cookieValue = [
-            'access_token' => $result['access_token'],
-            'refresh_token' => $result['refresh_token'],
-            'token_expires_at' => (time() + $result['expires_in']),
-            'cookie_expires_at' => $cookie['cookie_expires_at']
-        ];
-
-        setcookie('MRBAPITOKEN', json_encode($cookieValue), $cookie['cookie_expires_at'], '/');
-
-        return $result;
     }
 
     public function _call($url, $method, $getParams = array(), $postParams = array())
@@ -194,6 +119,81 @@ class MrbApiClient
 
         curl_close($curl_request);
         ob_end_flush();
+
+        return $result;
+    }
+
+    private function _getUrl($endpoint, $params)
+    {
+        $url = self::API_URL . $endpoint;
+
+        if (isset($params['id'])) {
+            $url = $url . '/' . $params['id'];
+        }
+
+        return $url;
+    }
+
+    private function _newToken($config)
+    {
+        $this->config = array_merge(
+            [
+                'grant_type' => 'password'
+            ],
+            $config
+        );
+
+        $result = json_decode(
+            $this->_call(self::OAUTH2_TOKEN_URL, "POST", [], $this->config),
+            true
+        );
+
+        if (isset($result['error'])) {
+            return $result;
+        }
+
+        $cookieExpiration = (time() + 3600 * 24 * 7);
+
+        $cookieValue = [
+            'access_token' => $result['access_token'],
+            'refresh_token' => $result['refresh_token'],
+            'token_expires_at' => (time() + $result['expires_in']),
+            'cookie_expires_at' => $cookieExpiration
+        ];
+
+        setcookie('MRBAPITOKEN', json_encode($cookieValue), $cookieExpiration, '/');
+
+        return $result;
+    }
+
+    private function _refreshToken($config)
+    {
+        $cookie = json_decode($_COOKIE['MRBAPITOKEN'], true);
+        $this->config = array_merge(
+            [
+                'refresh_token' => $cookie['refresh_token'],
+                'grant_type' => 'refresh_token'
+            ],
+            $config
+        );
+
+        $result = json_decode(
+            $this->_call(self::OAUTH2_TOKEN_URL, "POST", [], $this->config),
+            true
+        );
+
+        if (isset($result['error'])) {
+            return $result;
+        }
+
+        $cookieValue = [
+            'access_token' => $result['access_token'],
+            'refresh_token' => $result['refresh_token'],
+            'token_expires_at' => (time() + $result['expires_in']),
+            'cookie_expires_at' => $cookie['cookie_expires_at']
+        ];
+
+        setcookie('MRBAPITOKEN', json_encode($cookieValue), $cookie['cookie_expires_at'], '/');
 
         return $result;
     }
