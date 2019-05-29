@@ -1,14 +1,10 @@
 <?php
 
-namespace Marvia\CoreBundle\Service\Api;
-
-const API_BASE_PATH = 'https://api.mrbframework.nl';
-//const API_BASE_PATH = 'https://api.staging.mrbframework.nl;
-//const API_BASE_PATH = 'http://api.mrbframework.localhost/local_marvia.php';
+// const API_BASE_PATH = 'https://api.mrbframework.com';
+// const API_BASE_PATH = 'https://api.staging.mrbframework.com';
 
 class MrbApiClient
 {
-
     const OAUTH2_TOKEN_URL = API_BASE_PATH . '/oauth/v2/token';
     const API_URL = API_BASE_PATH . '/api';
 
@@ -18,19 +14,17 @@ class MrbApiClient
 
     public function __construct($config = array())
     {
-        if (isset($_COOKIE['MRBAPITOKEN'])) { //use or refresh token
-
+        if (isset($_COOKIE['MRBAPITOKEN'])) {
             $cookie = json_decode($_COOKIE['MRBAPITOKEN'], true);
 
             if ($cookie['token_expires_at'] >= time()) {
                 $result['access_token'] = $cookie['access_token'];
                 $result['refresh_token'] = $cookie['refresh_token'];
             } else {
-                $result = $this->refreshToken($config);
+                $result = $this->_refreshToken($config);
             }
-
-        } else { //create new token
-            $result = $this->newToken($config);
+        } else {
+            $result = $this->_newToken($config);
         }
 
         if (isset($result['error'])) {
@@ -44,7 +38,7 @@ class MrbApiClient
     public function delete($endpoint, $params = [])
     {
         return $this->_call(
-            $this->getUrl($endpoint, $params),
+            $this->_getUrl($endpoint, $params),
             'DELETE',
             $params
         );
@@ -53,18 +47,13 @@ class MrbApiClient
     public function get($endpoint, $params = [])
     {
         return $this->_call(
-            $this->getUrl($endpoint, $params),
+            $this->_getUrl($endpoint, $params),
             'GET',
             $params
         );
     }
 
-    public function getToken()
-    {
-        return $this->access_token;
-    }
-
-    private function getUrl($endpoint, $params)
+    private function _getUrl($endpoint, $params)
     {
         $url = self::API_URL . $endpoint;
 
@@ -75,7 +64,7 @@ class MrbApiClient
         return $url;
     }
 
-    private function newToken($config)
+    private function _newToken($config)
     {
         $this->config = array_merge(
             [
@@ -84,7 +73,10 @@ class MrbApiClient
             $config
         );
 
-        $result = json_decode($this->_call(self::OAUTH2_TOKEN_URL, "POST", [], $this->config), true);
+        $result = json_decode(
+            $this->_call(self::OAUTH2_TOKEN_URL, "POST", [], $this->config),
+            true
+        );
 
         if (isset($result['error'])) {
             return $result;
@@ -107,7 +99,7 @@ class MrbApiClient
     public function post($endpoint, $params = [])
     {
         return $this->_call(
-            $this->getUrl($endpoint, $params),
+            $this->_getUrl($endpoint, $params),
             'POST',
             [],
             $params
@@ -117,14 +109,14 @@ class MrbApiClient
     public function put($endpoint, $params = [])
     {
         return $this->_call(
-            $this->getUrl($endpoint, $params),
+            $this->_getUrl($endpoint, $params),
             'PUT',
             [],
             $params
         );
     }
 
-    public function refreshToken($config)
+    private function _refreshToken($config)
     {
         $cookie = json_decode($_COOKIE['MRBAPITOKEN'], true);
         $this->config = array_merge(
@@ -135,7 +127,10 @@ class MrbApiClient
             $config
         );
 
-        $result = json_decode($this->_call(self::OAUTH2_TOKEN_URL, "POST", [], $this->config), true);
+        $result = json_decode(
+            $this->_call(self::OAUTH2_TOKEN_URL, "POST", [], $this->config),
+            true
+        );
 
         if (isset($result['error'])) {
             return $result;
@@ -158,8 +153,8 @@ class MrbApiClient
         ob_start();
         $curl_request = curl_init();
 
-        curl_setopt($curl_request, CURLOPT_HEADER, 0); // don't include the header info in the output
-        curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, 1); // don't display the output on the screen
+        curl_setopt($curl_request, CURLOPT_HEADER, 0);
+        curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, 1);
         $url = $url . "?" . http_build_query($getParams);
 
         if ($this->access_token) {
@@ -168,34 +163,35 @@ class MrbApiClient
         }
 
         switch (strtoupper($method)) {
-            case "POST": // Set the request options for POST requests (create)
-                curl_setopt($curl_request, CURLOPT_URL, $url); // request URL
-                curl_setopt($curl_request, CURLOPT_POST, 1); // set request type to POST
-                curl_setopt($curl_request, CURLOPT_POSTFIELDS, http_build_query($postParams)); // set request params
+            case "POST":
+                curl_setopt($curl_request, CURLOPT_URL, $url);
+                curl_setopt($curl_request, CURLOPT_POST, 'POST');
+                curl_setopt($curl_request, CURLOPT_POSTFIELDS, http_build_query($postParams));
                 break;
-            case "GET": // Set the request options for GET requests (read)
-                curl_setopt($curl_request, CURLOPT_URL, $url); // request URL and params
+            case "GET":
+                curl_setopt($curl_request, CURLOPT_URL, $url);
                 break;
-            case "PUT": // Set the request options for PUT requests (update)
-                curl_setopt($curl_request, CURLOPT_URL, $url); // request URL
-                curl_setopt($curl_request, CURLOPT_CUSTOMREQUEST, "PUT"); // set request type
-                curl_setopt($curl_request, CURLOPT_POSTFIELDS, http_build_query($postParams)); // set request params
+            case "PUT":
+                curl_setopt($curl_request, CURLOPT_URL, $url);
+                curl_setopt($curl_request, CURLOPT_CUSTOMREQUEST, "PUT");
+                curl_setopt($curl_request, CURLOPT_POSTFIELDS, http_build_query($postParams));
                 break;
             case "DELETE":
-                curl_setopt($curl_request, CURLOPT_URL, $url); // request URL
-                curl_setopt($curl_request, CURLOPT_CUSTOMREQUEST, "DELETE"); // set request type
-                curl_setopt($curl_request, CURLOPT_POSTFIELDS, http_build_query($postParams)); // set request params
+                curl_setopt($curl_request, CURLOPT_URL, $url);
+                curl_setopt($curl_request, CURLOPT_CUSTOMREQUEST, "DELETE");
+                curl_setopt($curl_request, CURLOPT_POSTFIELDS, http_build_query($postParams));
                 break;
             default:
                 curl_setopt($curl_request, CURLOPT_URL, $url);
                 break;
         }
 
-        $result = curl_exec($curl_request); // execute the request
+        $result = curl_exec($curl_request);
 
         if ($result === false) {
             $result = curl_error($curl_request);
         }
+
         curl_close($curl_request);
         ob_end_flush();
 

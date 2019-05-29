@@ -1,12 +1,19 @@
 <?php
 
+const API_BASE_PATH = 'https://api.mrbframework.com';
+// const API_BASE_PATH = 'https://api.staging.mrbframework.com';
+
 require_once '../src/MRBApiClient.php';
 
-$client = new MRBApiClient (
+$client = new MrbApiClient(
     [
-        'client_id' => '1_1sfhc4n2zq4g0cwccs4cw4kggc4ssgwcwo4scskosggokww8wc',
-        'client_secret' => '1bfca8dnbvgkkkokgw8gs00co4cokggs4k08484sk8s4g8ock',
-        'username' => 'nvanrees',
-        'password' => 'pb010108',
+        'client_id'     => '',
+        'client_secret' => '',
+        'username'      => '',
+        'password'      => '',
     ]
 );
+
+$testArray = $client->get('/web-shop/module/editor/site/document/all');
+
+print_r($testArray);
