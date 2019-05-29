@@ -1,7 +1,7 @@
 <?php
 
-const API_BASE_PATH = 'https://api.mrbframework.com';
-// const API_BASE_PATH = 'https://api.staging.mrbframework.com';
+// const API_BASE_PATH = 'https://api.mrbframework.com';
+const API_BASE_PATH = 'https://api.staging.mrbframework.com';
 
 require_once '../src/MRBApiClient.php';
 
