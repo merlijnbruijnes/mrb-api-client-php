@@ -1,8 +1,5 @@
 <?php
 
-// const API_BASE_PATH = 'https://api.mrbframework.com';
-// const API_BASE_PATH = 'https://api.staging.mrbframework.com';
-
 class MrbApiClient
 {
     const OAUTH2_TOKEN_URL = API_BASE_PATH . '/oauth/v2/token';
