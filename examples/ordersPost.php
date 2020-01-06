@@ -4,7 +4,7 @@ require_once dirname(__FILE__) . '/../src/MRBApiClient.php';
 require_once dirname(__FILE__) . '/config.php.inc';
 
 $postData = [
-    'setShippingAddress' => true, // required true / false
+    'setShippingAddress' => true, // required true/false
     'addresses' => [
         'invoice' => [
             "customerNumber" => "", // string optional
@@ -21,7 +21,7 @@ $postData = [
             "email" => "invoice@email.com", // string required
             "comments" => "" // string optional
         ],
-        'shipping' => [ // only checked if setShippingAddress is set to true
+        'shipping' => [ // only checked if setDeliveryAddress is set to true
             "customerNumber" => "", // string optional
             "company" => "", // string optional
             "firstname" => "Shipping firstname", // string required if setShippingAddress is true
@@ -48,6 +48,9 @@ $postData = [
         ]
     ],
 ];
+
+print_r($client->post('/web-shop/module/orders/site/orders', $postData));
+exit();
 
 $data = json_decode(
     $client->post('/web-shop/module/orders/site/orders', $postData),
