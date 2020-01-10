@@ -3,7 +3,7 @@
 class MrbApiClient
 {
     const OAUTH2_TOKEN_URL = API_BASE_PATH . '/oauth/v2/token';
-    const API_URL = API_BASE_PATH . '/api';
+    const API_URL = API_BASE_PATH . '/api/v1';
 
     private $config;
     protected $access_token;
