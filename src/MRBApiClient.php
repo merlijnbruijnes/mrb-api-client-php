@@ -11,17 +11,25 @@ class MrbApiClient
 
     public function __construct($config = array())
     {
-        if (isset($_COOKIE['MRBAPITOKEN'])) {
+       if (isset($_COOKIE['MRBAPITOKEN'])) {
             $cookie = json_decode($_COOKIE['MRBAPITOKEN'], true);
-
-            if ($cookie['token_expires_at'] >= time()) {
-                $result['access_token'] = $cookie['access_token'];
-                $result['refresh_token'] = $cookie['refresh_token'];
+            
+            if (
+                isset($cookie['access_token']) && $cookie['access_token'] != null
+                &&
+                isset($cookie['refresh_token']) && $cookie['refresh_token'] != null
+            ) {
+                if ($cookie['token_expires_at'] >= time()) {
+                    $result['access_token'] = $cookie['access_token'];
+                    $result['refresh_token'] = $cookie['refresh_token'];
+                } else {
+                    $result = $this->refreshToken($config);
+                }
             } else {
-                $result = $this->_refreshToken($config);
+                $result = $this->newToken($config);
             }
         } else {
-            $result = $this->_newToken($config);
+            $result = $this->newToken($config);
         }
 
         if (isset($result['error'])) {
