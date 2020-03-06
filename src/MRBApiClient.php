@@ -26,10 +26,10 @@ class MrbApiClient
                     $result = $this->refreshToken($config);
                 }
             } else {
-                $result = $this->newToken($config);
+                $result = $this->_newToken($config);
             }
         } else {
-            $result = $this->newToken($config);
+            $result = $this->_newToken($config);
         }
 
         if (isset($result['error'])) {
